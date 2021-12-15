@@ -53,6 +53,7 @@ public class YamapViewManager extends ViewGroupManager<YamapView> {
                 .put("routes", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onRouteFound")))
                 .put("cameraPosition", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onCameraPositionReceived")))
                 .put("cameraPositionChanged", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onCameraPositionChange")))
+                .put("userPosition", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onUserPositionReceived")))
                 .put("visibleRegion", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onVisibleRegionReceived")))
                 .put("onMapPress", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onMapPress")))
                 .put("onMapLongPress", MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onMapLongPress")))
@@ -115,6 +116,11 @@ public class YamapViewManager extends ViewGroupManager<YamapView> {
             case "setTrafficVisible":
                 if (args != null) {
                    view.setTrafficVisible(args.getBoolean(0));
+                }
+                return;
+            case "getUserPosition":
+                if (args != null) {
+                   view.emitUserPositionToJS(args.getString(0));
                 }
                 return;
             default:

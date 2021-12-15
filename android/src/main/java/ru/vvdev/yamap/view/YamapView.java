@@ -17,9 +17,10 @@ import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.RequestPoint;
 import com.yandex.mapkit.RequestPointType;
-import com.yandex.mapkit.location;
+import com.yandex.mapkit.location.Location;
 import com.yandex.mapkit.location.LocationManager;
 import com.yandex.mapkit.location.LocationListener;
+import com.yandex.mapkit.location.LocationStatus;
 import com.yandex.mapkit.directions.DirectionsFactory;
 import com.yandex.mapkit.directions.driving.DrivingOptions;
 import com.yandex.mapkit.directions.driving.DrivingRoute;
@@ -170,6 +171,27 @@ public class YamapView extends MapView implements UserLocationObjectListener, Ca
 
         return result;
     }
+
+    public WritableMap userPositionToJSON() {
+        WritableMap result = Arguments.createMap();
+        MapKitFactory.getInstance().createLocationManager().requestSingleUpdate(new LocationListener() {
+          @Override
+          public void onLocationUpdated(@NonNull Location location) {
+             result.putDouble("lat", location.getPosition().getLatitude());
+             result.putDouble("lon", location.getPosition().getLongitude());
+          }
+          @Override
+          public void onLocationStatusUpdated(@NonNull LocationStatus locationStatus) {}
+        });
+        return result;
+     }
+ 
+     public void  emitUserPositionToJS(String id) {
+         WritableMap result = userPositionToJSON();
+         result.putString("id", id);
+         ReactContext reactContext = (ReactContext) getContext();
+         reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "userPosition", result);
+     }
 
     public void emitVisibleRegionToJS(String id) {
         VisibleRegion visibleRegion = getMap().getVisibleRegion();
@@ -384,18 +406,18 @@ public class YamapView extends MapView implements UserLocationObjectListener, Ca
         }
     }
 
-    public Map<String, String> getUserPosition() {
+    public Map<String, Double> getUserPosition() {
+        HashMap<String, Double> map = new HashMap<>();
         MapKitFactory.getInstance().createLocationManager().requestSingleUpdate(new LocationListener() {
-            HashMap<String, String> map = new HashMap<>();
             @Override
             public void onLocationUpdated(@NonNull Location location) {
                 map.put("lat", location.getPosition().getLatitude());
                 map.put("lon", location.getPosition().getLongitude());
             }
-    
+
             @Override
             public void onLocationStatusUpdated(@NonNull LocationStatus locationStatus) {
-    
+
             }
         });
         return map;
