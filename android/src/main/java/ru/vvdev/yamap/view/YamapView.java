@@ -17,6 +17,9 @@ import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.RequestPoint;
 import com.yandex.mapkit.RequestPointType;
+import com.yandex.mapkit.location;
+import com.yandex.mapkit.location.LocationManager;
+import com.yandex.mapkit.location.LocationListener;
 import com.yandex.mapkit.directions.DirectionsFactory;
 import com.yandex.mapkit.directions.driving.DrivingOptions;
 import com.yandex.mapkit.directions.driving.DrivingRoute;
@@ -379,6 +382,23 @@ public class YamapView extends MapView implements UserLocationObjectListener, Ca
             userLocationLayer.setHeadingEnabled(false);
             userLocationLayer.setObjectListener(null);
         }
+    }
+
+    public Map<String, String> getUserPosition() {
+        MapKitFactory.getInstance().createLocationManager().requestSingleUpdate(new LocationListener() {
+            HashMap<String, String> map = new HashMap<>();
+            @Override
+            public void onLocationUpdated(@NonNull Location location) {
+                map.put("lat", location.getPosition().getLatitude());
+                map.put("lon", location.getPosition().getLongitude());
+            }
+    
+            @Override
+            public void onLocationStatusUpdated(@NonNull LocationStatus locationStatus) {
+    
+            }
+        });
+        return map;
     }
 
     private WritableMap convertRouteSection(Route route, final Section section, Polyline geometry, Weight routeWeight, int routeIndex) {
